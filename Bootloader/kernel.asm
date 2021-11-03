@@ -2,6 +2,8 @@ org 0x7e00
 jmp 0x0000:start
 
 data:
+
+  ; Dados da primeira parte(Marcelo)
     mensagem1 db 'Desvende o enigma para ajudar o Mario a encontrar seu cogumelo!',0
     mensagem2 db 'Aqui estao as pistas (escreva em minusculo):',0
     songp1 db 'Hier kommt die Sonne "do hm do do"',0
@@ -16,6 +18,16 @@ data:
     bee db 'bee', 0
     aviso db 'tente em portugues!', 0
     mensagemfinal db 'PARABENS!',0
+
+  ; Dados da segunda parte (Hugo)
+    mensagem_inicial db 'Desvende o caca-palavra abaixo!',10, 13, 0
+    mensagem_resposta db 'Resposta: ',0
+    caca_palavra db  'M V R T M E',10,13,'S B C E O P',10,13,'A E O N B A',10,13,'R M C O W U',10,13,'K I P E T S', 10, 13,'E Y I O P E', 10, 13, 0
+    boot_ans db 'boot',0
+    sao_iguais db 'Voce acertou!',10, 13, 0
+    sao_diferentes db 'Voce Errou!',10,13,0
+    string_var db 20
+
 
 putchar:
   mov ah, 0x0e
@@ -115,7 +127,30 @@ strcmp:              ; mov si, string1, mov di, string2, compara as strings apon
         jmp .loop       ; volta para o inicio do loop
     .endloop:
     ret
-
+comparar:
+    .loopi:
+        xor ax, ax
+        mov bx, ax
+        mov si, dx
+        lodsb
+        mov bx, ax
+        inc dx
+        xor ax, ax
+        mov si, cx
+        lodsb
+        inc cx
+        cmp ax, bx
+        jne .diff
+        cmp ax, 0
+        je .done
+        jmp .loopi
+        .diff:
+            mov dx, 0
+            jmp .end
+    .done:
+        mov dx, 1
+    .end:
+ret
 clear:                   ; mov bl, color
   ; set the cursor to top left-most corner of screen
   mov dx, 0 
@@ -156,6 +191,18 @@ start:
     mov ds, ax
     mov es, ax
     
+    call primeira_parte
+
+    call segunda_parte
+
+
+done:
+    jmp $
+
+
+
+primeira_parte:
+
     mov bl, 15 
     call clear
     
@@ -283,7 +330,42 @@ start:
     mov si, mensagemfinal
     call prints
     call endl
-    jmp done
+    ret
 
-done:
-    jmp $
+segunda_parte:
+
+  mov bl, 15
+  call clear
+
+    mov si, mensagem_inicial
+    call print_string
+    
+    call endl
+
+    mov si, caca_palavra
+    call print_string
+    call endl
+    
+    mov si, mensagem_resposta
+    call print_string
+    
+    mov di, string_var
+    call gets
+    call endl
+    mov si, string_var
+    mov cx, si
+    mov si, boot_ans
+    mov dx, si
+    call comparar
+    cmp dx, 1
+    je .acertou
+    cmp dx, 0
+    je .errou
+    .acertou:
+        mov si, sao_iguais
+        call print_string
+        ret
+    .errou:
+        mov si, sao_diferentes
+        call print_string
+        ret
