@@ -2,13 +2,15 @@ org 0x7e00
 jmp 0x0000:start
 
 data:
+
+    ; Dados da primeira parte(Marcelo)
     mensagem1 db 'Desvende o enigma para ajudar o Mario a encontrar seu cogumelo!',0
     mensagem2 db 'Aqui estao as pistas (escreva em minusculo):',0
     songp1 db 'Hier kommt die Sonne "do hm do do"',0
     songp2 db 'Hier kommt die Sonne',0
     songp3 db 'Und ich sage, es ist in Ordnung!',0
     morse db '-- --- ...- .. . / ... --- ..- -. -.. - .-. .- -.-. -.-',0
-    mell db 'Luisa Mell',0
+    mell db 'Luisa MELL',0
     answer db 'Resposta: ',0
     answer1 db '[Tente novamente] Resposta: ',0
     respostauser times 50 db 0
@@ -16,6 +18,26 @@ data:
     bee db 'bee', 0
     aviso db 'tente em portugues!', 0
     mensagemfinal db 'PARABENS!',0
+    acertouf1 db 'Muito esperto, passaria em md... Mas duvido passar da segunda fase!'
+    
+    ; Dados da segunda parte (Cleber)
+    inputo times 100 db 0
+    
+    correti db 'A proxima fase te aguarda!',0
+    nomes db 'Cleber Victor da Silva Junior - cvsj    Fabio Willian Andrade Silva- fwas       Hugo Alves Cardoso-hac                  Marcelo Cristian da Silva Brito-mcsb',0
+    opcaoa db 'Fase II',0
+    alta db 'PRESSIONE A -> Jogar                    PRESSIONE B -> Extras ',0
+    string db 'Insira seu palpite: ',0
+    errou db 'Resposta Errada',0
+    
+    ; Dados da primeira parte (Hugo)
+    mensagem_inicial db 'Desvende o caca-palavra abaixo!',10, 13, 0
+    mensagem_resposta db 'Resposta: ',0
+    caca_palavra db  'M V R T M E',10,13,'S B C E O P',10,13,'A E O N B A',10,13,'R M C O W U',10,13,'K I P E T S', 10, 13,'E Y I O P E', 10, 13, 0
+    boot_ans db 'boot',0
+    sao_iguais db 'Voce acertou!',10, 13, 0
+    sao_diferentes db 'Voce Errou!',10,13,0
+    string_var db 20
 
 putchar:
   mov ah, 0x0e
@@ -136,21 +158,305 @@ clear:                   ; mov bl, color
   mov ah, 0x2
   int 0x10
   ret
+
+delay_300ms:
+xor bx,bx
+loop:
+cmp bx, 300
+je cabou
+mov ah ,86h
+int 15h
+inc bx
+call loop
+
+cabou:
+ret
+
+stoi:							; mov si, string
+	xor cx, cx
+	xor ax, ax
+	.loop1:
+		push ax
+		lodsb
+		mov cl, al
+		pop ax
+		cmp cl, 0				; check EOF(NULL)
+		je .endloop1
+		sub cl, 48				; '9'-'0' = 9
+		mov bx, 10
+		mul bx					; 999*10 = 9990
+		add ax, cx				; 9990+9 = 9999
+		jmp .loop1
+	.endloop1:
+	ret
+
+comparar:
+    .loopi:
+        xor ax, ax
+        mov bx, ax
+        mov si, dx
+        lodsb
+        mov bx, ax
+        inc dx
+        xor ax, ax
+        mov si, cx
+        lodsb
+        inc cx
+        cmp ax, bx
+        jne .diff
+        cmp ax, 0
+        je .done
+        jmp .loopi
+        .diff:
+            mov dx, 0
+            jmp .end
+    .done:
+        mov dx, 1
+    .end:
+ret
+
+fase3:
+
+  mov bl, 15
+  call clear
+
+    mov si, mensagem_inicial
+    call prints
+    
+    call endl
+
+    mov si, caca_palavra
+    call prints
+    call endl
+    
+    mov si, mensagem_resposta
+    call prints
+    
+    mov di, string_var
+    call gets
+    call endl
+    mov si, string_var
+    mov cx, si
+    mov si, boot_ans
+    mov dx, si
+    call comparar
+    cmp dx, 1
+    je .acertou
+    cmp dx, 0
+    je .errou
+    .acertou:
+        mov si, sao_iguais
+        call prints
+        ret
+    .errou:
+        mov si, sao_diferentes
+        call prints
+        jmp fase3
+
+fase2:
+    
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+    
+    ;Código do projeto...
+
+
+    
+    mov ah, 00h  ; setando video mode 00 
+    mov al, 00h
+    int 10h
+
+
   
+    mov si, opcaoa
+    call prints
+
+
+    mov ah, 02h
+    mov bh, 00h
+    mov dh, 03h
+    mov dl, 10h
+    int 10h
+
+    mov ah, 09h
+    mov al, 'M'
+    mov bh, 00h
+    mov bl, 02
+    mov cx, 01
+    int 10h
+   
+   
+    mov ah, 02h
+    mov bh, 00h
+    mov dh, 03h
+    mov dl, 11h
+    int 10h
+
+    mov ah, 09h
+    mov al, 'E'
+    mov bh, 00h
+    mov bl, 0Ch
+    mov cx, 01
+    int 10h
+
+    mov ah, 02h
+    mov bh, 00h
+    mov dh, 03h
+    mov dl, 12h
+    int 10h
+
+
+    mov ah, 09h
+    mov al, 'D'
+    mov bh, 00h
+    mov bl, 0Fh
+    mov cx, 01
+    int 10h
+
+
+    mov ah, 02h
+    mov bh, 00h
+    mov dh, 03h
+    mov dl, 13h
+    int 10h
+
+
+    mov ah, 09h
+    mov al, 'I'
+    mov bh, 00h
+    mov bl, 01h
+    mov cx, 01
+    int 10h
+
+
+    mov ah, 02h
+    mov bh, 00h
+    mov dh, 03h
+    mov dl, 14h
+    int 10h
+
+
+    mov ah, 09h
+    mov al, 'A'
+    mov bh, 00h
+    mov bl, 03h
+    mov cx, 01
+    int 10h
+
+
+    mov ah, 02h
+    mov bh, 00h
+    mov dh, 03h
+    mov dl, 16h
+    int 10h
+
+
+    mov ah, 09h
+    mov al, 'C'
+    mov bh, 00h
+    mov bl, 02
+    mov cx, 01
+    int 10h
+
+    mov ah, 02h
+    mov bh, 00h
+    mov dh, 03h
+    mov dl, 17h
+    int 10h
+
+
+    mov ah, 09h
+    mov al, 'O'
+    mov bh, 00h
+    mov bl, 01h
+    mov cx, 01
+    int 10h
+
+
+    mov ah, 02h
+    mov bh, 00h
+    mov dh, 03h
+    mov dl, 18h
+    int 10h
+
+
+    mov ah, 09h
+    mov al, 'R'
+    mov bh, 00h
+    mov bl, 04h
+    mov cx, 01
+    int 10h
+
+
+    mov ah, 02h
+    mov bh, 00h
+    mov dh, 09h
+    mov dl, 09h
+    int 10h
+
+
+    xor ax, ax
+
+
+
+    mov si, string
+    call prints
+
+     
+    mov di, inputo
+    call gets
+    
+    mov si, inputo
+    call stoi   ;convertendo para int e guardando em al
+
+    
+    mov ah, 02h   ;movendo o cursor
+    mov bh, 00h
+    mov dh, 10h
+    mov dl, 09h
+    int 10h
+
+    xor si, si
+    mov si, correti
+    cmp al, 5   ; vendo se a resposra ta certa
+    je .courreto
+    cmp al, 5   ; vendo se a resposra ta certa
+    jne .erraudo
+    
+    .courreto:
+        call prints
+        call delay_300ms
+        call clear
+        jmp fase3
+
+    
+    .erraudo:
+    mov si, errou
+    call prints
+    
+    call delay_300ms
+
+    call clear
+
+    mov ah, 00h
+    mov al, 00h
+    int 10h
+
+    jmp fase2
+
+    ret
+    
 tab:
     mov al, 32
     call putchar
     inc bl
     cmp bl, cl
     jne tab
+    cmp bl, cl
+    je cabou
 
-space:
-  mov ah, 0x0e
-  mov al, 32
-  int 10h
-  ret
-
-start:
+fase1:
     
     xor ax, ax
     mov ds, ax
@@ -240,7 +546,7 @@ start:
     mov si, resposta
     mov di, respostauser
     call strcmp
-    je .end
+    je .acertou1
     call strcmp
     jne .loop
     
@@ -269,21 +575,73 @@ start:
     mov si, resposta
     mov di, respostauser
     call strcmp
-    je .end
+    je .acertou1
     call strcmp
     jne .loop
     
-    xor bx, bx
-    .end:
-        mov al, 32
-    	call putchar
-    	inc bl
-    	cmp bl, cl
-	jne .end
-    mov si, mensagemfinal
+    .acertou1:
+        xor bx, bx
+        mov cl, 7
+        call tab
+        mov si, acertouf1
+        call prints
+        xor bx, bx
+        .loope:
+            mov ah, 86h
+            int 15h
+            inc bl
+            cmp bl, 10
+            jne .loope
+        call clear
+        jmp fase2
+    
+opcao_a:
+    call clear
+    jmp fase1
+    ret
+
+
+opcao_b:
+    call clear
+    mov ah, 00h  ; setando video mode 00 
+    mov al, 00h
+    int 10h
+    mov si, nomes
     call prints
-    call endl
-    jmp done
+    ret
+
+getmenu:
+    loop1:
+        call getchar
+        cmp al, 41h
+        je opcao_a
+        cmp al, 61h
+        je opcao_a
+        cmp al, 42h
+        je opcao_b
+        cmp al, 62h
+        je opcao_b
+    call loop1
+    ret
+
+main_menu:
+    mov si, alta 
+    call prints
+
+    mov di, inputo
+    call getmenu
+    ret
+
+start:
+    
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+    
+    ;Código do projeto...
+    
+
+    call main_menu
 
 done:
     jmp $
