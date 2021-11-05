@@ -33,11 +33,11 @@ data:
     ; Dados da primeira parte (Hugo)
     mensagem_inicial db 'Desvende o caca-palavra abaixo!',10, 13, 0
     mensagem_resposta db 'Resposta: ',0
-    caca_palavra db  'M V R T M E',10,13,'S B C E O P',10,13,'A E O N B A',10,13,'R M C O W U',10,13,'K I P E T S', 10, 13,'E Y I O P E', 10, 13, 0
+    caca_palavra db  '    M V R T M E',10,13,'    S B C E O P',10,13,'    A E O N B A',10,13,'    R M C O W U',10,13,'    K I P E T S', 10, 13,'    E Y I O P E', 10, 13, 0
     boot_ans db 'boot',0
     sao_iguais db 'Voce acertou!',10, 13, 0
     sao_diferentes db 'Voce Errou!',10,13,0
-    string_var db 20
+    string_var times 20 db 0
 
 putchar:
   mov ah, 0x0e
