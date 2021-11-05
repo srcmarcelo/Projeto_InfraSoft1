@@ -282,8 +282,8 @@ fase4:
 
 
     cmp dx, 1
-  	  je igual
-  	  mov si, mensagem8    
+  	je igual
+  	mov si, mensagem8    
     call prints         
     call endl
     jmp fase4
