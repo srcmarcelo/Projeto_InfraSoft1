@@ -30,14 +30,28 @@ data:
     string db 'Insira seu palpite: ',0
     errou db 'Resposta Errada',0
     
-    ; Dados da primeira parte (Hugo)
-    mensagem_inicial db 'Desvende o caca-palavra abaixo!',10, 13, 0
+    ; Dados da terceira parte (Hugo)
+    mensagem_inicial db ' Desvende o caca-palavra abaixo!',10, 13, 0
     mensagem_resposta db 'Resposta: ',0
     caca_palavra db  '    M V R T M E',10,13,'    S B C E O P',10,13,'    A E O N B A',10,13,'    R M C O W U',10,13,'    K I P E T S', 10, 13,'    E Y I O P E', 10, 13, 0
     boot_ans db 'boot',0
     sao_iguais db 'Voce acertou!',10, 13, 0
     sao_diferentes db 'Voce Errou!',10,13,0
     string_var times 20 db 0
+
+    ; Dados da quarta parte (Fabio)
+    mensagem1F db 'Resolva a charada',0
+    stringF times 20 db 0
+    x times 10 db 0
+    valor times 10 db 0
+    respostaF db '3', 0
+	  mensagem2F db 'Sem sair do seu cantinho, e capaz de viajar ao redor do mundo',0
+	  mensagem3 db '1 - vento',0
+	  mensagem4 db '2 - passaro',0
+	  mensagem5 db '3 - selo',0
+	  mensagem6 db '4 - nuvem',0	
+	  mensagem7 db 'acerto',0
+    mensagem8 db 'Errou,Respota : selo',0
 
 putchar:
   mov ah, 0x0e
@@ -215,10 +229,71 @@ comparar:
     .end:
 ret
 
+igual:
+	mov si, mensagem7
+	call prints
+	call endl
+  jmp done
+  
+
+fase4:
+    
+    xor ax, ax
+    mov ds, ax
+    mov es, ax  
+    mov ah, 00h  ; setando video mode 00 
+    mov al, 00h
+    int 10h  
+
+
+
+   ;print charadas
+    mov si, mensagem1F   
+    call prints         
+    call endl
+	  mov si, mensagem2F  
+    call prints         
+    call endl
+	  mov si, mensagem3    
+    call prints         
+    call endl
+	  mov si, mensagem4    
+    call prints         
+    call endl
+	  mov si, mensagem5    
+    call prints         
+    call endl
+  	mov si, mensagem6    
+    call prints         
+    call endl
+
+
+	  ;get x
+    mov di, x           
+    call gets
+
+
+  	;compara x = 3
+    mov si, x
+    mov cx, si 
+    mov si, resposta 
+    mov dx, si 
+    call comparar
+
+
+    cmp dx, 1
+  	  je igual
+  	  mov si, mensagem8    
+    call prints         
+    call endl
+    jmp fase4
+
+
+
 fase3:
 
-  mov bl, 15
-  call clear
+    mov bl, 15
+    call clear
 
     mov si, mensagem_inicial
     call prints
@@ -228,30 +303,37 @@ fase3:
     mov si, caca_palavra
     call prints
     call endl
+  
+    .resposta:
+      mov si, mensagem_resposta
+      call prints
     
-    mov si, mensagem_resposta
-    call prints
-    
-    mov di, string_var
-    call gets
-    call endl
-    mov si, string_var
-    mov cx, si
-    mov si, boot_ans
-    mov dx, si
-    call comparar
-    cmp dx, 1
-    je .acertou
-    cmp dx, 0
-    je .errou
-    .acertou:
-        mov si, sao_iguais
+      mov di, string_var
+      call gets
+      call endl
+      mov si, string_var
+      mov cx, si
+      mov si, boot_ans
+      mov dx, si
+      call comparar
+      cmp dx, 1
+        je .acertou
+      cmp dx, 0
+         je .errou
+      .acertou:
+       mov si, sao_iguais
         call prints
-        ret
-    .errou:
+        call endl
+          jmp .pulafase
+      .errou:
         mov si, sao_diferentes
         call prints
-        jmp fase3
+          jmp .resposta
+     .pulafase:
+        call clear
+          jmp fase4
+
+
 
 fase2:
     
